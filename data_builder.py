@@ -80,7 +80,7 @@ def fine_tune():
       hyperparameters={
         "n_epochs": 5,
         "batch_size": 1,
-        "learning_rate_multiplier": 0.5
+        "learning_rate_multiplier": 2
       },
       suffix='FGPT',
     )

@@ -101,6 +101,7 @@ def get_responses(client, srt_text):
 
 
 def create_new_srt(input_file_path, output_file_path, gpt_responses):
+    print('Creating new subtitle file.')
     srt_contents = load_full_srt(input_file_path)
     new_srt_content = []
 
@@ -115,6 +116,7 @@ def create_new_srt(input_file_path, output_file_path, gpt_responses):
         counter += 1
     with open(output_file_path, 'w', encoding='utf-8-sig') as file:
         file.write('\n'.join(new_srt_content))
+    print('New subtitle file Created.')
 
 
 if __name__ == '__main__':

@@ -2,10 +2,7 @@ import re
 import time
 import json
 
-raw_instruction = """ You are given a japanese subtitle. 
-                  You add furigana in brackets right after kanji, katakana and numbers.
-                  You don't add anything to hiragana.
-              """
+raw_instruction = """x"""
 
 instruction = re.sub(' {2,}', ' ', raw_instruction.replace('\n', ' ').strip())
 
