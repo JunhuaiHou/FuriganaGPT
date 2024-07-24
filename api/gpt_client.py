@@ -40,7 +40,7 @@ def remove_brackets(text):
         return re.sub(r'（(.*?)）', r'\1', text)
 
 
-def prepare_requests(srt_text, client):
+def prepare_batch_requests(srt_text, client):
     requests = []
     model = get_latest_model(client)
     for i, text in enumerate(srt_text):
@@ -116,3 +116,16 @@ def retrieve_batch(client, batch_id):
             print("Batch not completed yet. Checking again in 1 second...")
 
         time.sleep(1)
+
+
+def query_chatgpt(client, prompt, model):
+    clean_text = remove_brackets(prompt)
+    completion = client.chat.completions.create(
+      model=model,
+      messages=[
+        {"role": "system", "content": instruction},
+        {"role": "user", "content": clean_text}
+      ]
+    )
+    print(f'Request submitted with model: {model}, instruction: "{instruction}", prompt: "{prompt}".')
+    return completion
