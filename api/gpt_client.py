@@ -118,13 +118,13 @@ def retrieve_batch(client, batch_id):
         time.sleep(1)
 
 
-def query_chatgpt(client, prompt, model):
-    clean_text = remove_brackets(prompt)
+def query_chatgpt(client, raw_prompt, model):
+    prompt = remove_brackets(raw_prompt)
     completion = client.chat.completions.create(
       model=model,
       messages=[
         {"role": "system", "content": instruction},
-        {"role": "user", "content": clean_text}
+        {"role": "user", "content": prompt}
       ]
     )
     print(f'Request submitted with model: {model}, instruction: "{instruction}", prompt: "{prompt}".')
