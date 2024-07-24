@@ -30,14 +30,14 @@ def get_latest_model(client):
 
 
 def remove_brackets(text):
-    text_no_parentheses = re.sub(r'\(.*?\)', '', text)
+    modified_text = re.sub(r'\{.*?\}', '', text)
+    text_no_parentheses = re.sub(r'\(.*?\)', '', modified_text)
     text_no_full_width_parentheses = re.sub(r'（.*?）', '', text_no_parentheses)
-    modified_text = re.sub(r'\{.*?\}', '', text_no_full_width_parentheses)
 
     if re.search(r'\S', modified_text):
-        return modified_text.strip()
+        return text_no_full_width_parentheses.strip()
     else:
-        return re.sub(r'（(.*?)）', r'\1', text)
+        return re.sub(r'（(.*?)）', r'\1', modified_text)
 
 
 def prepare_batch_requests(srt_text, client):
