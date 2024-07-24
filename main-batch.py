@@ -23,6 +23,9 @@ def load_srt(file_path):
     for line in lines:
         line_content = line.strip()
 
+        if line_content.startswith('\ufeff'):
+            line_content = line_content[1:]
+
         if line_content.isdigit():
             if current_subtitle:
                 text.append(' '.join(current_subtitle))
@@ -44,7 +47,6 @@ def load_srt(file_path):
 
     if current_subtitle:
         text.append(' '.join(current_subtitle))
-
     return text
 
 
@@ -56,6 +58,8 @@ def load_full_srt(file_path):
     current_subtitle = []
     for line in lines:
         line_content = line.strip()
+        if line_content.startswith('\ufeff'):
+            line_content = line_content[1:]
 
         if line_content.isdigit() and current_subtitle:
             text.append('\n'.join(current_subtitle))

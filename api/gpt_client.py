@@ -24,7 +24,7 @@ def get_latest_model(client):
             break
 
     if fine_tuned_model is None:
-        fine_tuned_model = 'gpt-3.5-turbo-0125'
+        fine_tuned_model = 'gpt-4o-mini-2024-07-18'
     print('Retrieved model name: ' + fine_tuned_model)
     return fine_tuned_model
 
