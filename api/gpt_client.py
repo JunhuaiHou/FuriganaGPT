@@ -51,6 +51,7 @@ def prepare_batch_requests(srt_text, client):
             "url": "/v1/chat/completions",
             "body": {
                 "model": model,
+                "temperature": 0.0,
                 "messages": [
                     {"role": "system", "content": instruction},
                     {"role": "user", "content": clean_text}
@@ -122,6 +123,7 @@ def query_chatgpt(client, raw_prompt, model):
     prompt = remove_brackets(raw_prompt)
     completion = client.chat.completions.create(
       model=model,
+      temperature=0.0,
       messages=[
         {"role": "system", "content": instruction},
         {"role": "user", "content": prompt}
