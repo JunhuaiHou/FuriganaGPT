@@ -7,7 +7,7 @@ import json
 
 def find_srt_file():
     for file_name in os.listdir('./subtitles'):
-        if file_name.lower().endswith('.srt') and not file_name.startswith('znew'):
+        if file_name.lower().endswith('.srt') and not file_name.startswith('new'):
             return file_name
     return None
 
@@ -138,6 +138,6 @@ if __name__ == '__main__':
         srt_text = load_srt(srt_file_path)
         print(f'Loaded subtitle file name {srt_file_name}')
         responses = get_responses(client, srt_text)
-        create_new_srt(srt_file_path, f'subtitles/znew_{srt_file_name}', responses)
+        create_new_srt(srt_file_path, f'subtitles/new_{srt_file_name}', responses)
     else:
         print("No SRT file found in the current directory.")
