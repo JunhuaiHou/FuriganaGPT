@@ -7,8 +7,8 @@ import json
 
 def find_srt_file():
     for file_name in os.listdir('./subtitles'):
-        if file_name.lower().endswith('.srt'):
-            return os.path.join('subtitles', file_name)
+        if file_name.lower().endswith('.srt') and not file_name.startswith('znew'):
+            return file_name
     return None
 
 
@@ -132,11 +132,12 @@ if __name__ == '__main__':
         api_key = load_api_key()
 
     client = OpenAI(api_key=api_key)
-    srt_file_path = find_srt_file()
+    srt_file_name = find_srt_file()
+    srt_file_path = os.path.join('subtitles', srt_file_name)
     if srt_file_path:
         srt_text = load_srt(srt_file_path)
-        print('Loaded subtitles.')
+        print(f'Loaded subtitle file name {srt_file_name}')
         responses = get_responses(client, srt_text)
-        create_new_srt(srt_file_path, 'subtitles/znew_subtitle.srt', responses)
+        create_new_srt(srt_file_path, f'subtitles/znew_{srt_file_name}', responses)
     else:
         print("No SRT file found in the current directory.")
