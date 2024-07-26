@@ -12,8 +12,9 @@ env/
 # Ignore the api_key.txt file
 api/api_key.txt
 
-# Ignore .srt files
+# Ignore subtitle files
 *.srt
+*.vtt
 
 # Ignore .jsonl files
 *.jsonl
