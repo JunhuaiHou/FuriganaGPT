@@ -6,9 +6,13 @@ import json
 
 
 def find_srt_file():
-    for file_name in os.listdir('./subtitles'):
+    srt_files = os.listdir('./subtitles')
+
+    for file_name in srt_files:
         if file_name.lower().endswith('.srt') and not file_name.startswith('FGPT_'):
-            return file_name
+            fgpt_file_name = f'FGPT_{file_name}'
+            if fgpt_file_name not in srt_files:
+                return file_name
     return None
 
 

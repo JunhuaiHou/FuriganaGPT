@@ -31,7 +31,8 @@ def get_latest_model(client):
 
 def remove_brackets(text):
     modified_text = re.sub(r'\{.*?\}', '', text)
-    text_no_parentheses = re.sub(r'\(.*?\)', '', modified_text)
+    text_no_tag = re.sub(r'\<.*?\>', '', text)
+    text_no_parentheses = re.sub(r'\(.*?\)', '', text_no_tag)
     text_no_full_width_parentheses = re.sub(r'（.*?）', '', text_no_parentheses)
 
     if re.search(r'\S', modified_text):
