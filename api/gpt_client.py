@@ -8,6 +8,7 @@ instruction = re.sub(' {2,}', ' ', raw_instruction.replace('\n', ' ').strip())
 
 gpt_name = 'FGPT'
 
+
 def load_api_key():
     with open('api/api_key.txt', 'r') as file:
         api_key = file.read().strip()
