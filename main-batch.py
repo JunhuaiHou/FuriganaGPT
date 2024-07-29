@@ -3,15 +3,15 @@ from api.gpt_client import prepare_batch_requests, load_api_key, batch_query_cha
 import time
 import os
 import json
-
+from api.gpt_client import gpt_name
 
 def find_srt_file():
     srt_files = os.listdir('./subtitles')
 
     for file_name in srt_files:
-        if file_name.lower().endswith('.srt') and not file_name.startswith('FGPT_'):
-            fgpt_file_name = f'FGPT_{file_name}'
-            if fgpt_file_name not in srt_files:
+        if file_name.lower().endswith('.srt') and not file_name.startswith(f'{gpt_name}_'):
+            gpt_file_name = f'{gpt_name}_{file_name}'
+            if gpt_file_name not in srt_files:
                 return file_name
     return None
 
@@ -142,6 +142,6 @@ if __name__ == '__main__':
         srt_text = load_srt(srt_file_path)
         print(f'Loaded subtitle file name {srt_file_name}')
         responses = get_responses(client, srt_text)
-        create_new_srt(srt_file_path, f'subtitles/FGPT_{srt_file_name}', responses)
+        create_new_srt(srt_file_path, f'subtitles/{gpt_name}_{srt_file_name}', responses)
     else:
         print("No SRT file found in the current directory.")
