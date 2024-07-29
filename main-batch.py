@@ -5,6 +5,7 @@ import os
 import json
 from api.gpt_client import gpt_name
 
+
 def find_srt_file():
     srt_files = os.listdir('./subtitles')
 
