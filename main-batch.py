@@ -1,9 +1,8 @@
 from openai import OpenAI
-from api.gpt_client import prepare_batch_requests, load_api_key, batch_query_chatgpt, retrieve_batch
+from api.gpt_client import prepare_batch_requests, load_api_key, batch_query_chatgpt, retrieve_batch, gpt_name
 import time
 import os
 import json
-from api.gpt_client import gpt_name
 
 
 def find_srt_file():
