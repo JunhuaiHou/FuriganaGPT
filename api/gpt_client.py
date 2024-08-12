@@ -119,6 +119,8 @@ def retrieve_batch(client, batch_id, time_limit):
             return None
         elif second_counter > time_limit:
             print(f"Batch time exceeded time limit of {time_limit/60:.2f} minutes.")
+            print("Cancelling Batch.")
+            client.batches.cancel(batch_id)
             return None
         else:
             print("Batch not completed yet. Checking again in 1 second...")

@@ -86,7 +86,7 @@ def write_requests_to_file(requests, filename):
 
 def get_responses(client, subtitles):
     start_time = time.time()
-    time_limit = 300
+    time_limit = 30
 
     print('Preparing requests.')
     requests = prepare_batch_requests(subtitles, client)
