@@ -83,7 +83,8 @@ def batch_query_chatgpt(client):
     return response.id
 
 
-def retrieve_batch(client, batch_id):
+def retrieve_batch(client, batch_id, time_limit):
+    second_counter = 0
     while True:
         batch = client.batches.retrieve(batch_id)
 
@@ -114,12 +115,16 @@ def retrieve_batch(client, batch_id):
             return sorted_jsonl_content
 
         elif batch.status == 'expired' or batch.status == 'failed' or batch.status == 'cancelled':
-            print("Batch Failed")
-            return
+            print("Batch Failed.")
+            return None
+        elif second_counter > time_limit:
+            print(f"Batch time exceeded time limit of {time_limit/60:.2f} minutes.")
+            return None
         else:
             print("Batch not completed yet. Checking again in 1 second...")
 
         time.sleep(1)
+        second_counter += 1
 
 
 def query_chatgpt(client, raw_prompt, model):
