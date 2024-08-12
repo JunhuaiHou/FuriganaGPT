@@ -101,6 +101,7 @@ def get_responses(client, subtitles):
     if batch_response is None:
         print('Batch Generation has Failed to deliver within the Time Limit.')
         print('Sequential Generation Starting...')
+        start_time = time.time()
         model = get_latest_model(client)
         total_subtitles = len(subtitles)
         for idx, subtitle in enumerate(subtitles, start=1):
@@ -108,7 +109,11 @@ def get_responses(client, subtitles):
             content = response.choices[0].message.content
             gpt_responses.append(content)
             print(f'Request completed for subtitle {idx}/{total_subtitles}.')
-        return None
+        end_time = time.time()
+        duration = end_time - start_time
+        minutes, seconds = divmod(duration, 60)
+        print(f'Sequential Generation Successful. Duration: {int(minutes)} minutes {seconds:.2f} seconds')
+        return gpt_responses
     else:
         for line in batch_response.strip().split('\n'):
             if line.strip():
