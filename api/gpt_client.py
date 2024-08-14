@@ -97,7 +97,11 @@ def retrieve_batch(client, batch_id, time_limit):
         else:
             print(f"Requests finished: {completed_requests}/{total_requests} (Failed: {failed_requests})")
 
-        if batch.status == 'completed':
+        if failed_requests > 0:
+            print(f"Some Requests Failed. Cancelling Batch.")
+            client.batches.cancel(batch_id)
+            return None
+        elif batch.status == 'completed':
             print("Batch completed. Retrieving content...")
             binary_content = b""
             for chunk in client.files.content(batch.output_file_id).iter_bytes():
