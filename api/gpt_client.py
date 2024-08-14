@@ -139,5 +139,5 @@ def query_chatgpt(client, raw_prompt, model):
         {"role": "user", "content": prompt}
       ]
     )
-    print(f'Request submitted with model: {model}, instruction: "{instruction}", prompt: "{prompt}".')
+
     return completion
