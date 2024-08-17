@@ -1,7 +1,7 @@
 import yaml
 import json
 from openai import OpenAI
-from api.gpt_client import instruction, load_api_key, get_latest_model, gpt_name
+from modules.api.gpt_client import instruction, load_api_key, get_latest_model, gpt_name
 
 
 def format_data(prompt, answer):
