@@ -79,25 +79,6 @@ def get_responses(client, subtitles):
         return gpt_responses
 
 
-def create_new_srt(input_file_path, output_file_path, gpt_responses):
-    print('Creating new subtitle file.')
-    srt_contents = load_full_srt(input_file_path)
-    new_srt_content = []
-
-    counter = 1
-
-    for original, response in zip(srt_contents, gpt_responses):
-        first_two_lines, remaining_lines = original.split('\n', 2)[:2], original.split('\n', 2)[2:]
-        if not response.endswith('\n'):
-            response += '\n'
-
-        new_srt_content.append('\n'.join(first_two_lines) + '\n' + f'{counter}_ {response}')
-        counter += 1
-    with open(output_file_path, 'w', encoding='utf-8-sig') as file:
-        file.write('\n'.join(new_srt_content))
-    print('New subtitle file Created.')
-
-
 if __name__ == '__main__':
     debug = False
 
