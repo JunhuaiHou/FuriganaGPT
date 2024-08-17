@@ -10,7 +10,7 @@ gpt_name = 'FGPT'
 
 
 def load_api_key():
-    with open('api/api_key.txt', 'r') as file:
+    with open('modules/api/api_key.txt', 'r') as file:
         api_key = file.read().strip()
     return api_key
 
