@@ -45,7 +45,7 @@ class GPTGenerator:
 
         gpt_responses = []
         if batch_response is None:
-            print('Batch Generation has Failed to deliver within the Time Limit.')
+            print('Batch Generation has Failed to deliver within the time limit.')
             print('Sequential Generation Starting...')
             start_time = time.time()
             len_total_subs = len(subtitles)
@@ -88,8 +88,4 @@ class GPTGenerator:
         def increment(self):
             with self._lock:
                 self.value += 1
-            return self
-
-        def get_value(self):
-            with self._lock:
-                return self.value
+            return self.value
