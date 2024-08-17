@@ -10,7 +10,7 @@ venv/
 env/
 
 # Ignore the api_key.txt file
-api/api_key.txt
+modules/api/api_key.txt
 
 # Ignore subtitle files
 *.srt
