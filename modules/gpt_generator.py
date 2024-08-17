@@ -8,15 +8,17 @@ class GPTGenerator:
     def __init__(self):
         self.gpt_client = GPTClient()
         self.subs1, self.subs2 = [], []
+        self.counter = self.SharedCounter(0)
 
-    def process_subtitles(self, subtitles, start, results, index):
+    def process_subtitles(self, subtitles, start, results, index, len_total_subs):
         responses = []
 
         for idx, subtitle in enumerate(subtitles, start=start):
             response = self.gpt_client.query_chatgpt(subtitle)
             content = response.choices[0].message.content
             responses.append(content)
-            print(f'Request completed for subtitle {idx}')
+            counter = self.counter.increment()
+            print(f'Request completed for subtitle {idx}. {counter}/{len_total_subs} subtitles completed.')
 
         results[index] = responses
 
@@ -46,14 +48,14 @@ class GPTGenerator:
             print('Batch Generation has Failed to deliver within the Time Limit.')
             print('Sequential Generation Starting...')
             start_time = time.time()
-            total_subtitles = len(subtitles)
-            mid_point = total_subtitles // 2
+            len_total_subs = len(subtitles)
+            mid_point = len_total_subs // 2
             results = [[], []]
             subs1 = subtitles[:mid_point]
             subs2 = subtitles[mid_point:]
 
-            thread1 = threading.Thread(target=self.process_subtitles, args=(subs1, 1, results, 0))
-            thread2 = threading.Thread(target=self.process_subtitles, args=(subs2, mid_point + 1, results, 1))
+            thread1 = threading.Thread(target=self.process_subtitles, args=(subs1, 1, results, 0, len_total_subs))
+            thread2 = threading.Thread(target=self.process_subtitles, args=(subs2, mid_point + 1, results, 1,  len_total_subs))
             thread1.start()
             thread2.start()
             thread1.join()
@@ -77,3 +79,17 @@ class GPTGenerator:
             minutes, seconds = divmod(duration, 60)
             print(f'Batch Generation Successful. Duration: {int(minutes)} minutes {seconds:.2f} seconds')
             return gpt_responses
+
+    class SharedCounter:
+        def __init__(self, initial=0):
+            self.value = initial
+            self._lock = threading.Lock()
+
+        def increment(self):
+            with self._lock:
+                self.value += 1
+            return self
+
+        def get_value(self):
+            with self._lock:
+                return self.value
