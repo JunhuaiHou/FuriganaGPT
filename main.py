@@ -1,36 +1,33 @@
-from openai import OpenAI
 from modules.srt_loader import SRTLoader
-from modules.api.gpt_client import get_latest_model, prepare_batch_requests, load_api_key, batch_query_chatgpt, retrieve_batch, gpt_name, query_chatgpt
+from modules.api.gpt_client import GPTClient
 import time
 import json
 from multiprocessing import Process, Queue
 
 
-def write_requests_to_file(requests, filename):
-    print('Creating batch file.')
-    with open(filename, 'w') as f:
-        for request in requests:
-            f.write(json.dumps(request) + '\n')
-
-
-def process_subtitles(subtitles, start, model, client):
+def process_subtitles(subtitles, start, gpt_client):
     responses = []
     for idx, subtitle in enumerate(subtitles, start=start):
-        response = query_chatgpt(client, subtitle, model)
+        response = gpt_client.query_chatgpt(subtitle)
         content = response.choices[0].message.content
         responses.append(content)
         print(f'Request completed for subtitle {idx}')
     return responses
 
+def create_batch_file(self, requests, filename):
+        print('Creating batch file.')
+        with open(filename, 'w') as f:
+            for request in requests:
+                f.write(json.dumps(request) + '\n')
 
-def get_responses(client, subtitles):
+def get_responses(gpt_client, subtitles):
     start_time = time.time()
     time_limit = 300
 
     print('Preparing requests.')
-    requests = prepare_batch_requests(subtitles, client)
+    requests = gpt_client.prepare_batch_requests(subtitles)
     print('Requests prepared.')
-    write_requests_to_file(requests, 'batch.jsonl')
+    #gpt_client.create_batch(requests, 'batch.jsonl')
     print('Batch file created.')
     #id = batch_query_chatgpt(client)
     print('Batch file uploaded to OpenAI server.')
@@ -41,7 +38,6 @@ def get_responses(client, subtitles):
         print('Batch Generation has Failed to deliver within the Time Limit.')
         print('Sequential Generation Starting...')
         start_time = time.time()
-        model = get_latest_model(client)
         total_subtitles = len(subtitles)
         mid_point = total_subtitles // 2
 
@@ -58,7 +54,7 @@ def get_responses(client, subtitles):
         #
         # gpt_responses = result_queue.get() + result_queue.get()
 
-        gpt_responses = process_subtitles(subtitles, mid_point+1, model, client)
+        gpt_responses = process_subtitles(subtitles, mid_point+1, gpt_client)
 
         end_time = time.time()
         duration = end_time - start_time
@@ -80,19 +76,14 @@ def get_responses(client, subtitles):
 
 
 if __name__ == '__main__':
-    debug = False
-
-    if debug:
-        api_key = 'invalid_key'
-    else:
-        api_key = load_api_key()
-
-    client = OpenAI(api_key=api_key)
+    gpt_name = 'FGPT'
+    raw_instruction = """x"""
+    gpt_client = GPTClient()
     srt_loader = SRTLoader(gpt_name)
     if srt_loader.srt_file_path:
         srt_text = srt_loader.load_srt()
         print(f'Loaded subtitle file name {srt_loader.srt_file_name}')
-        responses = get_responses(client, srt_text)
+        responses = get_responses(gpt_client, srt_text)
         srt_loader.create_new_srt(responses)
     else:
         print("No SRT file found in the current directory.")

@@ -4,11 +4,12 @@ import os
 class SRTLoader:
     def __init__(self, gpt_name):
         self.gpt_name = gpt_name
+        self.folder_name = 'subtitles'
         self.srt_file_name = self.find_srt_file()
-        self.srt_file_path = os.path.join('subtitles', self.srt_file_name)
+        self.srt_file_path = os.path.join(self.folder_name, self.srt_file_name)
 
     def find_srt_file(self):
-        srt_files = os.listdir('./subtitles')
+        srt_files = os.listdir(f'./{self.folder_name}')
 
         for file_name in srt_files:
             if file_name.lower().endswith('.srt') and not file_name.startswith(f'{self.gpt_name}_'):
@@ -91,7 +92,7 @@ class SRTLoader:
             new_srt_content.append('\n'.join(first_two_lines) + '\n' + f'{counter}_ {response}')
             counter += 1
 
-        with open(f'subtitles/{self.gpt_name}_{self.srt_file_name}', 'w', encoding='utf-8-sig') as file:
+        with open(f'{self.folder_name}/{self.gpt_name}_{self.srt_file_name}', 'w', encoding='utf-8-sig') as file:
             file.write('\n'.join(new_srt_content))
 
         print('New subtitle file Created.')
