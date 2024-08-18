@@ -1,5 +1,5 @@
 import json
-from modules.api.gpt_client import GPTClient
+from modules.api.gpt_client import GPTClient, remove_brackets
 import time
 import threading
 
@@ -9,6 +9,8 @@ class GPTGenerator:
         self.gpt_client = GPTClient()
         self.subs1, self.subs2 = [], []
         self.counter = self.SharedCounter(0)
+        self.gpt_name = self.gpt_client.client
+        self.batch_file_name = 'batch.jsonl'
 
     def process_subtitles(self, subtitles, start, results, index, len_total_subs):
         responses = []
@@ -24,20 +26,41 @@ class GPTGenerator:
 
         return responses
 
-    def create_batch_file(self, requests, filename):
+    def create_batch_file(self, requests):
         print('Creating batch file.')
-        with open(filename, 'w') as f:
+        with open(self.batch_file_name, 'w') as f:
             for request in requests:
                 f.write(json.dumps(request) + '\n')
+
+    def prepare_batch_requests(self, srt_text):
+        requests = []
+        for i, text in enumerate(srt_text):
+            clean_text = remove_brackets(text)
+            request = {
+                "custom_id": f"request-{i+1}",
+                "method": "POST",
+                "url": "/v1/chat/completions",
+                "body": {
+                    "model": self.gpt_client.model,
+                    "temperature": 0.0,
+                    "messages": [
+                        {"role": "system", "content": self.gpt_client.instruction},
+                        {"role": "user", "content": clean_text}
+                    ],
+                    "max_tokens": 1000
+                }
+            }
+            requests.append(request)
+        return requests
 
     def get_responses(self, subtitles):
         start_time = time.time()
         time_limit = 300
 
         print('Preparing requests.')
-        requests = self.gpt_client.prepare_batch_requests(subtitles)
+        requests = self.prepare_batch_requests(subtitles)
         print('Requests prepared.')
-        self.create_batch_file(requests, 'batch.jsonl')
+        self.create_batch_file(requests)
         print('Batch file created.')
         batch_id = self.gpt_client.batch_query_chatgpt()
         print('Batch file uploaded to OpenAI server.')

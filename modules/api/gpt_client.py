@@ -1,7 +1,19 @@
-import re
 import time
 import json
 from openai import OpenAI
+import re
+
+
+def remove_brackets(text):
+    modified_text = re.sub(r'\{.*?\}', '', text)
+    text_no_tag = re.sub(r'\<.*?\>', '', text)
+    text_no_parentheses = re.sub(r'\(.*?\)', '', text_no_tag)
+    text_no_full_width_parentheses = re.sub(r'（.*?）', '', text_no_parentheses)
+
+    if re.search(r'\S', modified_text):
+        return text_no_full_width_parentheses.strip()
+    else:
+        return re.sub(r'（(.*?)）', r'\1', modified_text)
 
 
 class GPTClient:
@@ -10,6 +22,7 @@ class GPTClient:
         self.api_key_path = 'modules/api/api_key.txt'
         self.client = OpenAI(api_key=self.load_api_key())
         self.model = self.get_latest_model()
+        self.gpt_name = 'FGPT'
 
     def load_api_key(self):
         with open(self.api_key_path, 'r') as file:
@@ -30,38 +43,6 @@ class GPTClient:
             fine_tuned_model = 'gpt-4o-mini-2024-07-18'
         print('Retrieved model name: ' + fine_tuned_model)
         return fine_tuned_model
-
-    def remove_brackets(self, text):
-        modified_text = re.sub(r'\{.*?\}', '', text)
-        text_no_tag = re.sub(r'\<.*?\>', '', text)
-        text_no_parentheses = re.sub(r'\(.*?\)', '', text_no_tag)
-        text_no_full_width_parentheses = re.sub(r'（.*?）', '', text_no_parentheses)
-
-        if re.search(r'\S', modified_text):
-            return text_no_full_width_parentheses.strip()
-        else:
-            return re.sub(r'（(.*?)）', r'\1', modified_text)
-
-    def prepare_batch_requests(self, srt_text):
-        requests = []
-        for i, text in enumerate(srt_text):
-            clean_text = self.remove_brackets(text)
-            request = {
-                "custom_id": f"request-{i+1}",
-                "method": "POST",
-                "url": "/v1/chat/completions",
-                "body": {
-                    "model": self.model,
-                    "temperature": 0.0,
-                    "messages": [
-                        {"role": "system", "content": self.instruction},
-                        {"role": "user", "content": clean_text}
-                    ],
-                    "max_tokens": 1000
-                }
-            }
-            requests.append(request)
-        return requests
 
     def batch_query_chatgpt(self):
         batch_input_file = self.client.files.create(
@@ -129,7 +110,7 @@ class GPTClient:
             second_counter += 1
 
     def query_chatgpt(self, raw_prompt):
-        prompt = self.remove_brackets(raw_prompt)
+        prompt = remove_brackets(raw_prompt)
         completion = self.client.chat.completions.create(
           model=self.model,
           temperature=0.0,
@@ -140,3 +121,20 @@ class GPTClient:
         )
 
         return completion
+
+    def fine_tune(self, training_data):
+        training_file = self.client.files.create(
+            file=open(training_data, "rb"),
+            purpose="fine-tune"
+        )
+
+        self.client.fine_tuning.jobs.create(
+            training_file=training_file.id,
+            model=self.model,
+            hyperparameters={
+                "n_epochs": 5,
+                "batch_size": 1,
+                "learning_rate_multiplier": 2
+            },
+            suffix=self.gpt_name,
+        )
