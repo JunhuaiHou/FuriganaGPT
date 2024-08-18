@@ -1,7 +1,6 @@
 from modules.srt_loader import SRTLoader
 from modules.gpt_generator import GPTGenerator
 
-
 if __name__ == '__main__':
     raw_instruction = 'x'
     gpt_generator = GPTGenerator()
@@ -13,5 +12,3 @@ if __name__ == '__main__':
         srt_loader.create_new_srt(responses)
     else:
         print("No SRT file found in the current directory.")
-
-

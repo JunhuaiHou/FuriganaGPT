@@ -7,8 +7,8 @@ import re
 def remove_brackets(text):
     text_no_curly = re.sub(r'\{.*?\}', '', text)
     text_no_tag = re.sub(r'\<.*?\>', '', text_no_curly)
-    text_no_parentheses = re.sub(r'^\s*\(.*?\)', '', text_no_tag)
-    text_no_full_width_parentheses = re.sub(r'^\s*（.*?）', '', text_no_parentheses)
+    text_no_parentheses = re.sub(r'(^|\n)\s*\(.*?\)', r'\1', text_no_tag)
+    text_no_full_width_parentheses = re.sub(r'(^|\n)\s*（.*?）', r'\1', text_no_parentheses)
     if re.search(r'\S', text_no_full_width_parentheses):
         return text_no_full_width_parentheses.strip()
     else:
