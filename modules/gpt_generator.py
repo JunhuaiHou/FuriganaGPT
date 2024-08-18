@@ -9,7 +9,7 @@ class GPTGenerator:
         self.gpt_client = GPTClient()
         self.subs1, self.subs2 = [], []
         self.counter = self.SharedCounter(0)
-        self.gpt_name = self.gpt_client.client
+        self.gpt_name = self.gpt_client.gpt_name
         self.batch_file_name = 'batch.jsonl'
 
     def process_subtitles(self, subtitles, start, results, index, len_total_subs):
