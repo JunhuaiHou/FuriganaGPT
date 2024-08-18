@@ -68,40 +68,7 @@ class GPTGenerator:
 
         gpt_responses = []
         if batch_response is None:
-            print('Batch Generation has Failed to deliver within the time limit.')
-            print('Sequential Generation Starting...')
-            start_time = time.time()
-            len_total_subs = len(subtitles)
-            quarter_point = len_total_subs // 4
-            results = [[] for _ in range(4)]
-
-            subs_parts = [
-                subtitles[:quarter_point],
-                subtitles[quarter_point:quarter_point * 2],
-                subtitles[quarter_point * 2:quarter_point * 3],
-                subtitles[quarter_point * 3:]
-            ]
-
-            threads = []
-
-            for i in range(4):
-                thread = threading.Thread(
-                    target=self.process_subtitles,
-                    args=(subs_parts[i], i * quarter_point + 1, results, i, len_total_subs)
-                )
-                threads.append(thread)
-                thread.start()
-
-            for thread in threads:
-                thread.join()
-
-            gpt_responses = results[0] + results[1] + results[2] + results[3]
-
-            end_time = time.time()
-            duration = end_time - start_time
-            minutes, seconds = divmod(duration, 60)
-            print(f'Sequential Generation Successful. Duration: {int(minutes)} minutes {seconds:.2f} seconds')
-            return gpt_responses
+            return self.sequential_generation(subtitles)
         else:
             for line in batch_response.strip().split('\n'):
                 if line.strip():
@@ -112,8 +79,44 @@ class GPTGenerator:
             end_time = time.time()
             duration = end_time - start_time
             minutes, seconds = divmod(duration, 60)
-            print(f'Batch Generation Successful. Duration: {int(minutes)} minutes {seconds:.2f} seconds')
+            print(f'Batch Generation Successful. Duration: {int(minutes)} minutes {int(seconds)} seconds')
             return gpt_responses
+
+    def sequential_generation(self, subtitles):
+        print('Batch Generation has Failed to deliver within the time limit.')
+        print('Sequential Generation Starting...')
+        start_time = time.time()
+        len_total_subs = len(subtitles)
+        quarter_point = len_total_subs // 4
+        results = [[] for _ in range(4)]
+
+        subs_parts = [
+            subtitles[:quarter_point],
+            subtitles[quarter_point:quarter_point * 2],
+            subtitles[quarter_point * 2:quarter_point * 3],
+            subtitles[quarter_point * 3:]
+        ]
+
+        threads = []
+
+        for i in range(4):
+            thread = threading.Thread(
+                target=self.process_subtitles,
+                args=(subs_parts[i], i * quarter_point + 1, results, i, len_total_subs)
+            )
+            threads.append(thread)
+            thread.start()
+
+        for thread in threads:
+            thread.join()
+
+        gpt_responses = results[0] + results[1] + results[2] + results[3]
+
+        end_time = time.time()
+        duration = end_time - start_time
+        minutes, seconds = divmod(duration, 60)
+        print(f'Sequential Generation Successful. Duration: {int(minutes)} minutes {int(seconds)} seconds')
+        return gpt_responses
 
     class SharedCounter:
         def __init__(self, initial=0):
