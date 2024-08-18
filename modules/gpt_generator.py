@@ -49,18 +49,30 @@ class GPTGenerator:
             print('Sequential Generation Starting...')
             start_time = time.time()
             len_total_subs = len(subtitles)
-            mid_point = len_total_subs // 2
-            results = [[], []]
-            subs1 = subtitles[:mid_point]
-            subs2 = subtitles[mid_point:]
+            quarter_point = len_total_subs // 4
+            results = [[] for _ in range(4)]
 
-            thread1 = threading.Thread(target=self.process_subtitles, args=(subs1, 1, results, 0, len_total_subs))
-            thread2 = threading.Thread(target=self.process_subtitles, args=(subs2, mid_point + 1, results, 1,  len_total_subs))
-            thread1.start()
-            thread2.start()
-            thread1.join()
-            thread2.join()
-            gpt_responses = results[0] + results[1]
+            subs_parts = [
+                subtitles[:quarter_point],
+                subtitles[quarter_point:quarter_point * 2],
+                subtitles[quarter_point * 2:quarter_point * 3],
+                subtitles[quarter_point * 3:]
+            ]
+
+            threads = []
+
+            for i in range(4):
+                thread = threading.Thread(
+                    target=self.process_subtitles,
+                    args=(subs_parts[i], i * quarter_point + 1, results, i, len_total_subs)
+                )
+                threads.append(thread)
+                thread.start()
+
+            for thread in threads:
+                thread.join()
+
+            gpt_responses = results[0] + results[1] + results[2] + results[3]
 
             end_time = time.time()
             duration = end_time - start_time
