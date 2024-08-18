@@ -1,5 +1,5 @@
 import json
-from modules.api.gpt_client import GPTClient
+from modules.api.gpt_client import GPTClient, remove_brackets
 import time
 import threading
 
@@ -35,6 +35,7 @@ class GPTGenerator:
     def prepare_batch_requests(self, srt_text):
         requests = []
         for i, text in enumerate(srt_text):
+            clean_text = remove_brackets(text)
             request = {
                 "custom_id": f"request-{i+1}",
                 "method": "POST",
@@ -44,7 +45,7 @@ class GPTGenerator:
                     "temperature": 0.0,
                     "messages": [
                         {"role": "system", "content": self.gpt_client.instruction},
-                        {"role": "user", "content": srt_text}
+                        {"role": "user", "content": clean_text}
                     ],
                     "max_tokens": 1000
                 }

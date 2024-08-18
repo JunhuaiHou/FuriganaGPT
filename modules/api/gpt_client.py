@@ -1,6 +1,19 @@
 import time
 import json
 from openai import OpenAI
+import re
+
+
+def remove_brackets(text):
+    modified_text = re.sub(r'\{.*?\}', '', text)
+    text_no_tag = re.sub(r'\<.*?\>', '', text)
+    text_no_parentheses = re.sub(r'\(.*?\)', '', text_no_tag)
+    text_no_full_width_parentheses = re.sub(r'（.*?）', '', text_no_parentheses)
+
+    if re.search(r'\S', modified_text):
+        return text_no_full_width_parentheses.strip()
+    else:
+        return re.sub(r'（(.*?)）', r'\1', modified_text)
 
 
 class GPTClient:
@@ -96,7 +109,8 @@ class GPTClient:
             time.sleep(1)
             second_counter += 1
 
-    def query_chatgpt(self, prompt):
+    def query_chatgpt(self, raw_prompt):
+        prompt = remove_brackets(raw_prompt)
         completion = self.client.chat.completions.create(
           model=self.model,
           temperature=0.0,
