@@ -1,4 +1,14 @@
 import os
+import re
+
+
+def remove_brackets(text):
+    text_no_curly = re.sub(r'\{.*?\}', '', text)
+    text_no_tag = re.sub(r'\<.*?\>', '', text_no_curly)
+    text_no_parentheses = re.sub(r'(^|\n)\s*\(.*?\)\s*', r'\1', text_no_tag)
+    text_no_full_width_parentheses = re.sub(r'(^|\n)\s*（.*?）\s*', r'\1', text_no_parentheses)
+
+    return text_no_full_width_parentheses
 
 
 class SRTLoader:
@@ -22,7 +32,7 @@ class SRTLoader:
         with open(self.srt_file_path, 'r', encoding='utf-8') as file:
             lines = file.readlines()
 
-        text = []
+        subtitles = []
         current_subtitle = []
         previous_line_was_timestamp = False
 
@@ -34,7 +44,8 @@ class SRTLoader:
 
             if line_content.isdigit():
                 if current_subtitle:
-                    text.append(' '.join(current_subtitle))
+                    subtitle_text = ' '.join(current_subtitle)
+                    subtitles.append(subtitle_text)
                     current_subtitle = []
                 previous_line_was_timestamp = False
                 continue
@@ -44,7 +55,7 @@ class SRTLoader:
                 continue
 
             if line_content:
-                current_subtitle.append(line_content)
+                current_subtitle.append(remove_brackets(line_content))
                 previous_line_was_timestamp = False
             else:
                 if previous_line_was_timestamp:
@@ -52,8 +63,9 @@ class SRTLoader:
                     previous_line_was_timestamp = False
 
         if current_subtitle:
-            text.append(' '.join(current_subtitle))
-        return text
+            subtitle_text = ' '.join(current_subtitle)
+            subtitles.append(subtitle_text)
+        return subtitles
 
     def load_full_srt(self):
         with open(self.srt_file_path, 'r', encoding='utf-8') as file:
