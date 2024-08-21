@@ -26,7 +26,7 @@ if __name__ == '__main__':
             print(answer + " does violate rules!!!!!!!")
             compliant = False
 
-    if compliant :
+    if compliant:
         print("Moderation complete. No OpenAI policy violation.")
         data_builder.save_training_data()
 
