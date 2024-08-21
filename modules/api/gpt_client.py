@@ -27,7 +27,7 @@ class GPTClient:
                 break
 
         if fine_tuned_model is None:
-            fine_tuned_model = 'gpt-4o-mini-2024-07-18'
+            fine_tuned_model = 'gpt-4o-2024-08-06'
         print('Retrieved model name: ' + fine_tuned_model)
         return fine_tuned_model
 
