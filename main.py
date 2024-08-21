@@ -3,7 +3,6 @@ from modules.gpt_generator import GPTGenerator
 
 
 if __name__ == '__main__':
-    raw_instruction = 'x'
     gpt_generator = GPTGenerator()
     srt_loader = SRTLoader(gpt_generator.gpt_name)
     if srt_loader.srt_file_path:
