@@ -8,15 +8,15 @@ if __name__ == '__main__':
 
     print("Moderation starting...")
 
-    compliance = True
+    compliant = True
 
     for pair in data_builder.training_pairs:
-        prompt= pair[0]
+        prompt = pair[0]
         moderation_result_0 = gpt_client.client.moderations.create(input=prompt)
 
         if moderation_result_0.results[0].flagged:
             print(prompt + " does violate rules!!!!!!!")
-            compliance = False
+            compliant  = False
             continue
 
         answer = pair[1]
@@ -24,9 +24,9 @@ if __name__ == '__main__':
 
         if moderation_result_1.results[0].flagged:
             print(answer + " does violate rules!!!!!!!")
-            compliance = False
+            compliant = False
 
-    if compliance:
+    if compliant :
         print("Moderation complete. No OpenAI policy violation.")
         data_builder.save_training_data()
 
