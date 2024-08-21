@@ -16,7 +16,7 @@ if __name__ == '__main__':
 
         if moderation_result_0.results[0].flagged:
             print(prompt + " does violate rules!!!!!!!")
-            compliant  = False
+            compliant = False
             continue
 
         answer = pair[1]
