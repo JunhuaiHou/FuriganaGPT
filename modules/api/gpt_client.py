@@ -56,8 +56,10 @@ class GPTClient:
             completed_requests = batch.request_counts.completed
             failed_requests = batch.request_counts.failed
 
-            if completed_requests + failed_requests == total_requests:
+            if completed_requests + failed_requests == total_requests and total_requests > 0:
                 print(f"Batch almost complete. Please wait...")
+            elif total_requests == 0:
+                print(f"Validating Batch...")
             else:
                 print(f"Requests finished: {completed_requests}/{total_requests} (Failed: {failed_requests})")
 
@@ -118,7 +120,7 @@ class GPTClient:
             training_file=training_file.id,
             model=self.model,
             hyperparameters={
-                "n_epochs": 5,
+                "n_epochs": 4,
                 "batch_size": 1,
                 "learning_rate_multiplier": 2
             },
