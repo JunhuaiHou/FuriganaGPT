@@ -32,35 +32,31 @@ if __name__ == '__main__':
 
     print("Moderation starting...")
 
-    compliant = True
-
     len_total_training_pairs = len(data_builder.training_pairs)
-    training_pairs = data_builder.training_pairs
-    for pair in training_pairs:
-        quarter_point = len_total_training_pairs // 4
-        results = [[] for _ in range(4)]
+    quarter_point = len_total_training_pairs // 4
+    results = [[] for _ in range(4)]
 
-        pairs_parts = [
-            training_pairs[:quarter_point],
-            training_pairs[quarter_point:quarter_point * 2],
-            training_pairs[quarter_point * 2:quarter_point * 3],
-            training_pairs[quarter_point * 3:]
-        ]
+    pairs_parts = [
+        data_builder.training_pairs[:quarter_point],
+        data_builder.training_pairs[quarter_point:quarter_point * 2],
+        data_builder.training_pairs[quarter_point * 2:quarter_point * 3],
+        data_builder.training_pairs[quarter_point * 3:]
+    ]
 
-        threads = []
+    threads = []
 
-        for i in range(4):
-            thread = threading.Thread(
-                target=moderate,
-                args=(pairs_parts[i], results, i)
-            )
-            threads.append(thread)
-            thread.start()
+    for i in range(4):
+        thread = threading.Thread(
+            target=moderate,
+            args=(pairs_parts[i], results, i)
+        )
+        threads.append(thread)
+        thread.start()
 
-        for thread in threads:
-            thread.join()
+    for thread in threads:
+        thread.join()
 
-        violations = results[0] + results[1] + results[2] + results[3]
+    violations = results[0] + results[1] + results[2] + results[3]
 
     if has_content(violations):
         print("The following training data violates OpenAI's policy!!!!!")
