@@ -18,6 +18,7 @@ class SRTLoader:
         self.srt_file_name = self.find_srt_file()
         self.srt_file_path = os.path.join(self.folder_name, self.srt_file_name)
         self.timestamps = []
+        self.original_srt = []
 
     def find_srt_file(self):
         srt_files = os.listdir(f'./{self.folder_name}')
@@ -33,7 +34,6 @@ class SRTLoader:
         with open(self.srt_file_path, 'r', encoding='utf-8') as file:
             lines = file.readlines()
 
-        subtitles = []
         current_subtitle = []
         previous_line_was_timestamp = False
 
@@ -45,7 +45,7 @@ class SRTLoader:
 
             if line_content.isdigit():
                 if current_subtitle:
-                    self.add_subtitle(current_subtitle, subtitles)
+                    self.add_subtitle(current_subtitle)
                     current_subtitle = []
                 previous_line_was_timestamp = False
                 continue
@@ -64,15 +64,15 @@ class SRTLoader:
                     previous_line_was_timestamp = False
 
         if current_subtitle:
-            self.add_subtitle(current_subtitle, subtitles)
-        return subtitles
+            self.add_subtitle(current_subtitle)
+        return self.original_srt
 
-    def add_subtitle(self, current_subtitle, subtitles):
+    def add_subtitle(self, current_subtitle):
         subtitle_text = ' '.join(current_subtitle)
         if all(c in ' \n' for c in subtitle_text):
             self.timestamps.pop()
         else:
-            subtitles.append(subtitle_text)
+            self.original_srt.append(subtitle_text)
 
     def create_new_srt(self, gpt_responses):
         print('Creating new subtitle file.')
@@ -81,12 +81,14 @@ class SRTLoader:
 
         counter = 1
 
-        for timestamp, response in zip(self.timestamps, gpt_responses):
-            srt = str(counter) + '\n' + timestamp + '\n' + f'{counter}_ {response}'
-            new_srt_content.append(srt)
+        for timestamp, response, original_srt in zip(self.timestamps, gpt_responses, self.original_srt):
+            response = response.rstrip('\n')
+            new_srt = str(counter) + '\n' + timestamp + '\n' + f'{counter}_ {response}' + '\n\n' + original_srt
+            new_srt_content.append(new_srt)
             counter += 1
 
         with open(f'{self.folder_name}/{self.gpt_name}_{self.srt_file_name}', 'w', encoding='utf-8-sig') as file:
-            file.write('\n\n'.join(new_srt_content))
+            file.write('\n\n\n'.join(new_srt_content))
 
         print('New subtitle file Created.')
+        os.remove(self.srt_file_path)
