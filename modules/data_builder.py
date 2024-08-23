@@ -18,8 +18,8 @@ class DataBuilder:
                 loaded_pairs = yaml.safe_load(file)
 
                 for pair in loaded_pairs:
-                    japanese = pair.get('prompt', 'Prompt not found')
-                    english = pair.get('answer', 'Answer not found')
+                    japanese = pair.get('prompt', 'Prompt not found').rstrip('\n')
+                    english = pair.get('answer', 'Answer not found').rstrip('\n')
 
                     translation_pairs.append((japanese, english))
         except FileNotFoundError:

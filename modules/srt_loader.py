@@ -17,6 +17,7 @@ class SRTLoader:
         self.folder_name = 'subtitles'
         self.srt_file_name = self.find_srt_file()
         self.srt_file_path = os.path.join(self.folder_name, self.srt_file_name)
+        self.timestamps = []
 
     def find_srt_file(self):
         srt_files = os.listdir(f'./{self.folder_name}')
@@ -44,13 +45,13 @@ class SRTLoader:
 
             if line_content.isdigit():
                 if current_subtitle:
-                    subtitle_text = ' '.join(current_subtitle)
-                    subtitles.append(subtitle_text)
+                    self.add_subtitle(current_subtitle, subtitles)
                     current_subtitle = []
                 previous_line_was_timestamp = False
                 continue
 
             if '-->' in line_content:
+                self.timestamps.append(line_content)
                 previous_line_was_timestamp = True
                 continue
 
@@ -63,48 +64,29 @@ class SRTLoader:
                     previous_line_was_timestamp = False
 
         if current_subtitle:
-            subtitle_text = ' '.join(current_subtitle)
-            subtitles.append(subtitle_text)
+            self.add_subtitle(current_subtitle, subtitles)
         return subtitles
 
-    def load_full_srt(self):
-        with open(self.srt_file_path, 'r', encoding='utf-8') as file:
-            lines = file.readlines()
-
-        text = []
-        current_subtitle = []
-        for line in lines:
-            line_content = line.strip()
-            if line_content.startswith('\ufeff'):
-                line_content = line_content[1:]
-
-            if line_content.isdigit() and current_subtitle:
-                text.append('\n'.join(current_subtitle))
-                current_subtitle = [line_content]
-            else:
-                current_subtitle.append(line_content)
-
-        if current_subtitle:
-            text.append('\n'.join(current_subtitle))
-
-        return text
+    def add_subtitle(self, current_subtitle, subtitles):
+        subtitle_text = ' '.join(current_subtitle)
+        if all(c in ' \n' for c in subtitle_text):
+            self.timestamps.pop()
+        else:
+            subtitles.append(subtitle_text)
 
     def create_new_srt(self, gpt_responses):
         print('Creating new subtitle file.')
-        srt_contents = self.load_full_srt()
+
         new_srt_content = []
 
         counter = 1
 
-        for original, response in zip(srt_contents, gpt_responses):
-            first_two_lines, remaining_lines = original.split('\n', 2)[:2], original.split('\n', 2)[2:]
-            if not response.endswith('\n'):
-                response += '\n'
-
-            new_srt_content.append('\n'.join(first_two_lines) + '\n' + f'{counter}_ {response}')
+        for timestamp, response in zip(self.timestamps, gpt_responses):
+            srt = str(counter) + '\n' + timestamp + '\n' + f'{counter}_ {response}'
+            new_srt_content.append(srt)
             counter += 1
 
         with open(f'{self.folder_name}/{self.gpt_name}_{self.srt_file_name}', 'w', encoding='utf-8-sig') as file:
-            file.write('\n'.join(new_srt_content))
+            file.write('\n\n'.join(new_srt_content))
 
         print('New subtitle file Created.')
