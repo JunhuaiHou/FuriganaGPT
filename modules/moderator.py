@@ -10,8 +10,6 @@ class Moderator:
         moderation_result = self.gpt_client.client.moderations.create(input=input)
 
         highest_score = max(vars(moderation_result.results[0].category_scores).values())
-        print(input)
-        print(highest_score)
         self.moderation_results[index].append((input, moderation_result.results[0].flagged, highest_score))
 
     def moderate(self, pairs, index):
