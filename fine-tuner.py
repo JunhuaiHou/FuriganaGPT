@@ -34,7 +34,7 @@ if __name__ == '__main__':
         print(highest_score[1])
 
         data_builder.save_training_data()
-        #gpt_client.fine_tune(data_builder.training_data)
+        gpt_client.fine_tune(data_builder.training_data)
 
         data_builder.archive_training()
         data_builder.rewrite_training_template()
