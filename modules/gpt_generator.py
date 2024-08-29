@@ -54,54 +54,51 @@ class GPTGenerator:
 
     def get_responses(self, subtitles):
         start_time = time.time()
-        time_limit = 300
+        # time_limit = 300
 
-        print('Preparing requests.')
-        requests = self.prepare_batch_requests(subtitles)
-        print('Requests prepared.')
-        self.create_batch_file(requests)
-        print('Batch file created.')
-        batch_id = self.gpt_client.batch_query_chatgpt()
-        print('Batch file uploaded to OpenAI server.')
-        batch_response = self.gpt_client.retrieve_batch(batch_id, time_limit)
+        # print('Preparing requests.')
+        # requests = self.prepare_batch_requests(subtitles)
+        # print('Requests prepared.')
+        # self.create_batch_file(requests)
+        # print('Batch file created.')
+        # batch_id = self.gpt_client.batch_query_chatgpt()
+        # print('Batch file uploaded to OpenAI server.')
+        # batch_response = self.gpt_client.retrieve_batch(batch_id, time_limit)
 
-        gpt_responses = []
-        if batch_response is None:
-            return self.sequential_generation(subtitles)
-        else:
-            for line in batch_response.strip().split('\n'):
-                if line.strip():
-                    data = json.loads(line)
-                    content = data['response']['body']['choices'][0]['message']['content']
-                    gpt_responses.append(content)
+        # gpt_responses = []
+        # if batch_response is None:
+        return self.sequential_generation(subtitles)
+        # else:
+        #     for line in batch_response.strip().split('\n'):
+        #         if line.strip():
+        #             data = json.loads(line)
+        #             content = data['response']['body']['choices'][0]['message']['content']
+        #             gpt_responses.append(content)
+        #
+        #     end_time = time.time()
+        #     duration = end_time - start_time
+        #     minutes, seconds = divmod(duration, 60)
+        #     print(f'Batch Generation Successful. Duration: {int(minutes)} minutes {int(seconds)} seconds')
+        #     return gpt_responses
 
-            end_time = time.time()
-            duration = end_time - start_time
-            minutes, seconds = divmod(duration, 60)
-            print(f'Batch Generation Successful. Duration: {int(minutes)} minutes {int(seconds)} seconds')
-            return gpt_responses
-
-    def sequential_generation(self, subtitles):
-        print('Batch Generation has Failed to deliver within the time limit.')
+    def sequential_generation(self, subtitles, num_threads=10):
         print('Sequential Generation Starting...')
         start_time = time.time()
+
         len_total_subs = len(subtitles)
-        quarter_point = len_total_subs // 4
-        results = [[] for _ in range(4)]
+        results = [[] for _ in range(num_threads)]
 
         subs_parts = [
-            subtitles[:quarter_point],
-            subtitles[quarter_point:quarter_point * 2],
-            subtitles[quarter_point * 2:quarter_point * 3],
-            subtitles[quarter_point * 3:]
+            subtitles[i * len_total_subs // num_threads: (i + 1) * len_total_subs // num_threads]
+            for i in range(num_threads)
         ]
 
         threads = []
 
-        for i in range(4):
+        for i in range(num_threads):
             thread = threading.Thread(
                 target=self.process_subtitles,
-                args=(subs_parts[i], i * quarter_point + 1, results, i, len_total_subs)
+                args=(subs_parts[i], i * (len_total_subs // num_threads) + 1, results, i, len_total_subs)
             )
             threads.append(thread)
             thread.start()
@@ -109,12 +106,13 @@ class GPTGenerator:
         for thread in threads:
             thread.join()
 
-        gpt_responses = results[0] + results[1] + results[2] + results[3]
+        gpt_responses = [item for sublist in results for item in sublist]
 
         end_time = time.time()
         duration = end_time - start_time
         minutes, seconds = divmod(duration, 60)
         print(f'Sequential Generation Successful. Duration: {int(minutes)} minutes {int(seconds)} seconds')
+
         return gpt_responses
 
     class SharedCounter:
