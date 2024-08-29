@@ -29,7 +29,7 @@ class GPTClient:
         if fine_tuned_model is None:
             fine_tuned_model = 'gpt-4o-2024-08-06'
         print('Retrieved model name: ' + fine_tuned_model)
-        return 'gpt-4o-2024-08-06'
+        return fine_tuned_model
 
     def batch_query_chatgpt(self):
         batch_input_file = self.client.files.create(
