@@ -120,9 +120,9 @@ class GPTClient:
             training_file=training_file.id,
             model=self.model,
             hyperparameters={
-                "n_epochs": 1,
+                "n_epochs": 2,
                 "batch_size": 1,
-                "learning_rate_multiplier": 2
+                "learning_rate_multiplier": 1
             },
             suffix=self.gpt_name,
         )
