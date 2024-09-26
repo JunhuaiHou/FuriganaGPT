@@ -28,6 +28,7 @@ class GPTClient:
 
         if fine_tuned_model is None:
             fine_tuned_model = 'gpt-4o-2024-08-06'
+
         print('Retrieved model name: ' + fine_tuned_model)
         return fine_tuned_model
 
@@ -122,7 +123,7 @@ class GPTClient:
             hyperparameters={
                 "n_epochs": 4,
                 "batch_size": 1,
-                "learning_rate_multiplier": 1.5
+                "learning_rate_multiplier": 1.75
             },
             suffix=self.gpt_name,
         )

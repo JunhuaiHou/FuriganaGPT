@@ -2,14 +2,14 @@ import os
 import re
 
 
-def remove_brackets(text):
+def remove_brackets_and_spaces(text):
     text_no_square = re.sub(r'\[.*?\]', '', text)
     text_no_curly = re.sub(r'\{.*?\}', '', text_no_square)
     text_no_tag = re.sub(r'\<.*?\>', '', text_no_curly)
     text_no_parentheses = re.sub(r'(^|\n)\s*\(.*?\)\s*', r'\1', text_no_tag)
     text_no_full_width_parentheses = re.sub(r'(^|\n)\s*（.*?）\s*', r'\1', text_no_parentheses)
 
-    return text_no_full_width_parentheses
+    return text_no_full_width_parentheses.strip()
 
 
 class SRTLoader:
@@ -57,7 +57,9 @@ class SRTLoader:
                 continue
 
             if line_content:
-                current_subtitle.append(remove_brackets(line_content))
+                clean_text = remove_brackets_and_spaces(line_content)
+                if clean_text:
+                    current_subtitle.append(clean_text)
                 previous_line_was_timestamp = False
             else:
                 if previous_line_was_timestamp:
