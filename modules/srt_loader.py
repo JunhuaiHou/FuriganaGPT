@@ -2,14 +2,14 @@ import os
 import re
 
 
-def remove_brackets_and_spaces(text):
+def remove_brackets(text):
     text_no_square = re.sub(r'\[.*?\]', '', text)
     text_no_curly = re.sub(r'\{.*?\}', '', text_no_square)
     text_no_tag = re.sub(r'\<.*?\>', '', text_no_curly)
     text_no_parentheses = re.sub(r'(^|\n)\s*\(.*?\)\s*', r'\1', text_no_tag)
     text_no_full_width_parentheses = re.sub(r'(^|\n)\s*（.*?）\s*', r'\1', text_no_parentheses)
 
-    return text_no_full_width_parentheses.strip()
+    return text_no_full_width_parentheses
 
 
 class SRTLoader:
@@ -57,9 +57,7 @@ class SRTLoader:
                 continue
 
             if line_content:
-                clean_text = remove_brackets_and_spaces(line_content)
-                if clean_text:
-                    current_subtitle.append(clean_text)
+                current_subtitle.append(remove_brackets(line_content))
                 previous_line_was_timestamp = False
             else:
                 if previous_line_was_timestamp:
@@ -75,7 +73,7 @@ class SRTLoader:
         if all(c in ' \n' for c in subtitle_text):
             self.timestamps.pop()
         else:
-            self.original_srt.append(subtitle_text)
+            self.original_srt.append(subtitle_text.strip())
 
     def create_new_srt(self, gpt_responses):
         print('Creating new subtitle file.')
