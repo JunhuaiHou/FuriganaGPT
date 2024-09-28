@@ -123,7 +123,7 @@ class GPTClient:
             hyperparameters={
                 "n_epochs": 4,
                 "batch_size": 1,
-                "learning_rate_multiplier": 1.75
+                "learning_rate_multiplier": 2
             },
             suffix=self.gpt_name,
         )
