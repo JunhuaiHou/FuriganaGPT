@@ -121,7 +121,7 @@ class GPTClient:
             training_file=training_file.id,
             model=self.model,
             hyperparameters={
-                "n_epochs": 4,
+                "n_epochs": 5,
                 "batch_size": 1,
                 "learning_rate_multiplier": 2
             },

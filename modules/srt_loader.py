@@ -8,8 +8,10 @@ def remove_brackets(text):
     text_no_tag = re.sub(r'\<.*?\>', '', text_no_curly)
     text_no_parentheses = re.sub(r'(^|\n)\s*\(.*?\)\s*', r'\1', text_no_tag)
     text_no_full_width_parentheses = re.sub(r'(^|\n)\s*（.*?）\s*', r'\1', text_no_parentheses)
+    text_no_left_full_width_parentheses = re.sub(r'(^|\n)\s*（[^）]*$', r'\1', text_no_full_width_parentheses)
+    text_no_right_full_width_parentheses = re.sub(r'(?<!（)[^（]*）\s*$', '', text_no_left_full_width_parentheses)
 
-    return text_no_full_width_parentheses
+    return text_no_right_full_width_parentheses
 
 
 class SRTLoader:
